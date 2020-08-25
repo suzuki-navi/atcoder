@@ -18,8 +18,8 @@ execute_testcases() {
     shift
     for f in $dir/*.in; do
         local f2=${f%%.*}
-        echo $@ $f \< $f2.in \> $f2.result
-        $@ $f < $f2.in > $f2.result
+        echo $@ \< $f2.in \> $f2.result
+        $@ < $f2.in > $f2.result
         diff -u $f2.result $f2.out && echo OK
     done
 }
@@ -43,6 +43,28 @@ execute_cpp() {
     execute_testcases $dirname $dirname/var-cpp/a.out
 }
 
+execute_scala() {
+    local script=$1
+    local dirname=$(dirname $script)
+    local fname=$(basename $script)
+    (
+        cd $dirname
+        if [ ! -e var-scala/.gitignore ]; then
+            mkdir -p var-scala
+            echo "*" > var-scala/.gitignore
+        fi
+        local hashfname=var-scala/src.built
+        if [ ! -e $hashfname ] || ! cmp $fname $hashfname >/dev/null; then
+            cp $fname $hashfname
+            (
+                cd var-scala
+                scalac ../$fname
+            )
+        fi
+    )
+    execute_testcases $dirname scala -cp $dirname/var-scala Main
+}
+
 execute_perl() {
     local script=$1
     local dirname=$(dirname $script)
@@ -58,6 +80,9 @@ execute_python() {
 case "$ext" in
     cpp)
         execute_cpp $script
+        ;;
+    scala)
+        execute_scala $script
         ;;
     pl)
         execute_perl $script
