@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -Ceu
+
 script=
 
 while [ $# -gt 0 ]; do
@@ -17,9 +19,9 @@ execute_testcases() {
     local dir=$1
     shift
     for f in $dir/*.in; do
-        local f2=${f%%.*}
+        local f2=$(echo $f | perl -nle '/^(.+)\.in$/ and print $1')
         echo $@ \< $f2.in \> $f2.result
-        $@ < $f2.in > $f2.result
+        /bin/time $@ < $f2.in >| $f2.result
         diff -u $f2.result $f2.out && echo OK
     done
 }
@@ -36,8 +38,8 @@ execute_cpp() {
         fi
         local hashfname=var-cpp/src.built
         if [ ! -e $hashfname ] || ! cmp $fname $hashfname >/dev/null; then
-            cp $fname $hashfname
             g++ -o var-cpp/a.out $fname
+            cp $fname $hashfname
         fi
     )
     execute_testcases $dirname $dirname/var-cpp/a.out
@@ -55,11 +57,11 @@ execute_scala() {
         fi
         local hashfname=var-scala/src.built
         if [ ! -e $hashfname ] || ! cmp $fname $hashfname >/dev/null; then
-            cp $fname $hashfname
             (
                 cd var-scala
                 scalac ../$fname
             )
+            cp $fname $hashfname
         fi
     )
     execute_testcases $dirname scala -cp $dirname/var-scala Main
