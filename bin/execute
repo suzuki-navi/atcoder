@@ -1,0 +1,57 @@
+#!/bin/sh
+
+script=
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        *)
+            script=$1
+            ;;
+    esac
+    shift
+done
+
+ext=${script##*.}
+
+execute_testcases() {
+    local dir=$1
+    shift
+    local cmds="$@"
+    for f in $dir/*.in; do
+        local f2=${f%%.*}
+        echo $cmds $f \< $f2.in \> $f2.result
+        $cmds $f < $f2.in > $f2.result
+        diff -u $f2.result $f2.out
+    done
+}
+
+execute_cpp() {
+    local script=$1
+    local dirname=$(dirname $script)
+    local fname=$(basename $script)
+    (
+        cd $dirname
+        if [ ! -e var-cpp/.gitignore ]; then
+            mkdir -p var-cpp
+            echo "*" > var-cpp/.gitignore
+        fi
+        local hashfname=var-cpp/src.built
+        if [ ! -e $hashfname ] || ! cmp $fname $hashfname >/dev/null; then
+            cp $fname $hashfname
+            g++ -o var-cpp/a.out $fname
+        fi
+    )
+    execute_testcases $dirname $dirname/var-cpp/a.out
+}
+
+case "$ext" in
+    cpp)
+        execute_cpp $script
+        ;;
+    *)
+        echo "Unknown extension: $ext"
+        exit 1
+        ;;
+esac
+
+
