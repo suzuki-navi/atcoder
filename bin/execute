@@ -16,12 +16,11 @@ ext=${script##*.}
 execute_testcases() {
     local dir=$1
     shift
-    local cmds="$@"
     for f in $dir/*.in; do
         local f2=${f%%.*}
-        echo $cmds $f \< $f2.in \> $f2.result
-        $cmds $f < $f2.in > $f2.result
-        diff -u $f2.result $f2.out
+        echo $@ $f \< $f2.in \> $f2.result
+        $@ $f < $f2.in > $f2.result
+        diff -u $f2.result $f2.out && echo OK
     done
 }
 
@@ -44,9 +43,18 @@ execute_cpp() {
     execute_testcases $dirname $dirname/var-cpp/a.out
 }
 
+execute_perl() {
+    local script=$1
+    local dirname=$(dirname $script)
+    execute_testcases $dirname perl $script
+}
+
 case "$ext" in
     cpp)
         execute_cpp $script
+        ;;
+    pl)
+        execute_perl $script
         ;;
     *)
         echo "Unknown extension: $ext"
