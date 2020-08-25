@@ -49,12 +49,21 @@ execute_perl() {
     execute_testcases $dirname perl $script
 }
 
+execute_python() {
+    local script=$1
+    local dirname=$(dirname $script)
+    execute_testcases $dirname python $script
+}
+
 case "$ext" in
     cpp)
         execute_cpp $script
         ;;
     pl)
         execute_perl $script
+        ;;
+    py)
+        execute_python $script
         ;;
     *)
         echo "Unknown extension: $ext"
