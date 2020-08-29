@@ -22,7 +22,7 @@ execute_testcases() {
         local f2=$(echo $f | perl -nle '/^(.+)\.in$/ and print $1')
         echo $@ \< $f2.in \> $f2.result
         /bin/time $@ < $f2.in >| $f2.result
-        diff -u $f2.result $f2.out && echo OK
+        diff -u --color=always $f2.result $f2.out && echo OK
     done
 }
 
@@ -79,6 +79,12 @@ execute_python() {
     execute_testcases $dirname python $script
 }
 
+execute_ruby() {
+    local script=$1
+    local dirname=$(dirname $script)
+    execute_testcases $dirname ruby $script
+}
+
 case "$ext" in
     cpp)
         execute_cpp $script
@@ -91,6 +97,9 @@ case "$ext" in
         ;;
     py)
         execute_python $script
+        ;;
+    rb)
+        execute_ruby $script
         ;;
     *)
         echo "Unknown extension: $ext"
