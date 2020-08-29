@@ -18,31 +18,42 @@ build_cpp() {
     g++ -o var/$fname-build/bin $fname
 }
 
+build_java() {
+    local fname=$1
+    (
+        cd var/$fname-build
+        cp ../../$fname ./Main.java
+        javac Main.java
+    )
+    echo "java -cp $(pwd)/var/$fname-build Main" >| var/$fname-build/bin
+    chmod +x var/$fname-build/bin
+}
+
 build_scala() {
     local fname=$1
     (
         cd var/$fname-build
         scalac ../../$fname
     )
-    echo "scala -cp $(pwd)/var/$fname-build Main" > var/$fname-build/bin
+    echo "scala -cp $(pwd)/var/$fname-build Main" >| var/$fname-build/bin
     chmod +x var/$fname-build/bin
 }
 
 build_perl() {
     local fname=$1
-    echo "perl $(pwd)/$fname" > var/$fname-build/bin
+    echo "perl $(pwd)/$fname" >| var/$fname-build/bin
     chmod +x var/$fname-build/bin
 }
 
 build_python() {
     local fname=$1
-    echo "python $(pwd)/$fname" > var/$fname-build/bin
+    echo "python $(pwd)/$fname" >| var/$fname-build/bin
     chmod +x var/$fname-build/bin
 }
 
 build_ruby() {
     local fname=$1
-    echo "ruby $(pwd)/$fname" > var/$fname-build/bin
+    echo "ruby $(pwd)/$fname" >| var/$fname-build/bin
     chmod +x var/$fname-build/bin
 }
 
@@ -54,6 +65,9 @@ build() {
     case "$ext" in
         cpp)
             build_cpp $fname
+            ;;
+        java)
+            build_java $fname
             ;;
         scala)
             build_scala $fname
