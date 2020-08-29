@@ -1,0 +1,95 @@
+#!/bin/sh
+
+set -Ceu
+
+script=
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        *)
+            script=$1
+            ;;
+    esac
+    shift
+done
+
+build_cpp() {
+    local fname=$1
+    g++ -o var/$fname-build/bin $fname
+}
+
+build_scala() {
+    local fname=$1
+    (
+        cd var/$fname-build
+        scalac ../../$fname
+    )
+    echo "scala -cp $(pwd)/var/$fname-build Main" > var/$fname-build/bin
+    chmod +x var/$fname-build/bin
+}
+
+build_perl() {
+    local fname=$1
+    echo "perl $(pwd)/$fname" > var/$fname-build/bin
+    chmod +x var/$fname-build/bin
+}
+
+build_python() {
+    local fname=$1
+    echo "python $(pwd)/$fname" > var/$fname-build/bin
+    chmod +x var/$fname-build/bin
+}
+
+build_ruby() {
+    local fname=$1
+    echo "ruby $(pwd)/$fname" > var/$fname-build/bin
+    chmod +x var/$fname-build/bin
+}
+
+build() {
+    local fname=$1
+
+    ext=${fname##*.}
+
+    case "$ext" in
+        cpp)
+            build_cpp $fname
+            ;;
+        scala)
+            build_scala $fname
+            ;;
+        pl)
+            build_perl $fname
+            ;;
+        py)
+            build_python $fname
+            ;;
+        rb)
+            build_ruby $fname
+            ;;
+        *)
+            echo "Unknown extension: $ext"
+            exit 1
+            ;;
+    esac
+}
+
+dirname=$(dirname $script)
+fname=$(basename $script)
+(
+    cd $dirname
+    if [ ! -e var/.gitignore ]; then
+        mkdir -p var
+        echo "*" > var/.gitignore
+    fi
+    if [ ! -e var/$fname-build ]; then
+        mkdir -p var/$fname-build
+    fi
+    hashfname=var/$fname-build/src.built
+    if [ ! -e $hashfname ] || ! cmp $fname $hashfname >/dev/null; then
+        build $fname >&2
+        cp $fname $hashfname
+    fi
+) >&2
+
+

@@ -13,98 +13,15 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-ext=${script##*.}
+dirname=$(dirname $script)
+fname=$(basename $script)
 
-execute_testcases() {
-    local dir=$1
-    shift
-    for f in $dir/*.in; do
-        local f2=$(echo $f | perl -nle '/^(.+)\.in$/ and print $1')
-        echo $@ \< $f2.in \> $f2.result
-        /bin/time $@ < $f2.in >| $f2.result
-        diff -u --color=always $f2.result $f2.out && echo OK
-    done
-}
+$(dirname $0)/build $script
 
-execute_cpp() {
-    local script=$1
-    local dirname=$(dirname $script)
-    local fname=$(basename $script)
-    (
-        cd $dirname
-        if [ ! -e var-cpp/.gitignore ]; then
-            mkdir -p var-cpp
-            echo "*" > var-cpp/.gitignore
-        fi
-        local hashfname=var-cpp/src.built
-        if [ ! -e $hashfname ] || ! cmp $fname $hashfname >/dev/null; then
-            g++ -o var-cpp/a.out $fname
-            cp $fname $hashfname
-        fi
-    )
-    execute_testcases $dirname $dirname/var-cpp/a.out
-}
-
-execute_scala() {
-    local script=$1
-    local dirname=$(dirname $script)
-    local fname=$(basename $script)
-    (
-        cd $dirname
-        if [ ! -e var-scala/.gitignore ]; then
-            mkdir -p var-scala
-            echo "*" > var-scala/.gitignore
-        fi
-        local hashfname=var-scala/src.built
-        if [ ! -e $hashfname ] || ! cmp $fname $hashfname >/dev/null; then
-            (
-                cd var-scala
-                scalac ../$fname
-            )
-            cp $fname $hashfname
-        fi
-    )
-    execute_testcases $dirname scala -cp $dirname/var-scala Main
-}
-
-execute_perl() {
-    local script=$1
-    local dirname=$(dirname $script)
-    execute_testcases $dirname perl $script
-}
-
-execute_python() {
-    local script=$1
-    local dirname=$(dirname $script)
-    execute_testcases $dirname python $script
-}
-
-execute_ruby() {
-    local script=$1
-    local dirname=$(dirname $script)
-    execute_testcases $dirname ruby $script
-}
-
-case "$ext" in
-    cpp)
-        execute_cpp $script
-        ;;
-    scala)
-        execute_scala $script
-        ;;
-    pl)
-        execute_perl $script
-        ;;
-    py)
-        execute_python $script
-        ;;
-    rb)
-        execute_ruby $script
-        ;;
-    *)
-        echo "Unknown extension: $ext"
-        exit 1
-        ;;
-esac
-
+for f in $dirname/*.in; do
+    f2=$(echo $f | perl -nle '/^(.+)\.in$/ and print $1')
+    echo $dirname/var/$fname-build/bin \< $f2.in \> $f2.result
+    /bin/time $dirname/var/$fname-build/bin < $f2.in >| $f2.result
+    diff -u --color=always $f2.result $f2.out && echo OK
+done
 
