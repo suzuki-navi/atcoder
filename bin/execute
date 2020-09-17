@@ -13,15 +13,10 @@ while [ $# -gt 0 ]; do
     shift
 done
 
+$(dirname $0)/build $script
+
 dirname=$(dirname $script)
 fname=$(basename $script)
 
-$(dirname $0)/build $script
-
-for f in $dirname/*.in; do
-    f2=$(echo $f | perl -nle '/^(.+)\.in$/ and print $1')
-    echo $dirname/var/$fname-build/bin \< $f2.in \> $f2.result
-    /bin/time $dirname/var/$fname-build/bin < $f2.in >| $f2.result
-    diff -u --color=always $f2.result $f2.out && echo OK
-done
+$dirname/var/$fname-build/bin
 

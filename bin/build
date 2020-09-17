@@ -101,7 +101,7 @@ fname=$(basename $script)
     fi
     hashfname=var/$fname-build/src.built
     if [ ! -e $hashfname ] || ! cmp $fname $hashfname >/dev/null; then
-        build $fname >&2
+        build $fname
         cp $fname $hashfname
     fi
 ) >&2
