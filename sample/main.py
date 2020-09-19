@@ -1,3 +1,5 @@
+# 
+
 a = int(input())
 [b, c] = map(int, input().split(" "))
 [t1, t2] = input().split(" ")
