@@ -39,6 +39,12 @@ build_scala() {
     chmod +x var/$fname-build/bin
 }
 
+build_php() {
+    local fname=$1
+    echo "php $(pwd)/$fname" >| var/$fname-build/bin
+    chmod +x var/$fname-build/bin
+}
+
 build_perl() {
     local fname=$1
     echo "perl $(pwd)/$fname" >| var/$fname-build/bin
@@ -71,6 +77,9 @@ build() {
             ;;
         scala)
             build_scala $fname
+            ;;
+        php)
+            build_php $fname
             ;;
         pl)
             build_perl $fname
