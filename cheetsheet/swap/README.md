@@ -1,4 +1,4 @@
-# 変数の値を入れ替える(swap)には
+# 変数の値を入れ替える(swap)には (C++、PHP、Perl、Python、Ruby)
 
 C++
 
