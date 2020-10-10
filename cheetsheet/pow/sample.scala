@@ -1,12 +1,12 @@
 object Main extends App {
   def pow(a: Int, b: Int, m: Int): Int = {
     @scala.annotation.tailrec
-    def sub(a: Long, b: Int, result: Long): Int = {
+    def sub(a: Long, b: Int, acc: Long): Int = {
       if (b == 0) {
-        result.toInt;
+        acc.toInt;
       } else {
-        val result2 = if (b % 2 == 1) result * a % m else result;
-        sub(a * a % m, b / 2, result2);
+        val acc2 = if (b % 2 == 1) acc * a % m else acc;
+        sub(a * a % m, b / 2, acc2);
       }
     }
     sub(a, b, 1);
