@@ -1,3 +1,5 @@
+#  
+
 a = gets.strip.to_i
 b, c = gets.strip.split(" ").map(&:to_i)
 t1, t2 = gets.strip.split(" ")
