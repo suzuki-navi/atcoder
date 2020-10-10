@@ -33,7 +33,7 @@ build_scala() {
     local fname=$1
     (
         cd var/$fname-build
-        scalac ../../$fname
+        scalac -feature ../../$fname
     )
     echo "scala -cp $(pwd)/var/$fname-build Main" >| var/$fname-build/bin
     chmod +x var/$fname-build/bin
@@ -51,6 +51,12 @@ build_perl() {
     chmod +x var/$fname-build/bin
 }
 
+build_nodejs() {
+    local fname=$1
+    echo "nodejs $(pwd)/$fname" >| var/$fname-build/bin
+    chmod +x var/$fname-build/bin
+}
+
 build_python() {
     local fname=$1
     echo "python $(pwd)/$fname" >| var/$fname-build/bin
@@ -60,6 +66,18 @@ build_python() {
 build_ruby() {
     local fname=$1
     echo "ruby $(pwd)/$fname" >| var/$fname-build/bin
+    chmod +x var/$fname-build/bin
+}
+
+build_elixir() {
+    local fname=$1
+    (
+        rm -rf var/$fname-build/compile
+        mkdir -p var/$fname-build/compile
+        cd var/$fname-build/compile
+        elixirc  ../../../$fname
+    )
+    echo "elixir -pa $(pwd)/var/$fname-build/compile -e Main.main" >| var/$fname-build/bin
     chmod +x var/$fname-build/bin
 }
 
@@ -84,11 +102,17 @@ build() {
         pl)
             build_perl $fname
             ;;
+        js)
+            build_nodejs $fname
+            ;;
         py)
             build_python $fname
             ;;
         rb)
             build_ruby $fname
+            ;;
+        ex)
+            build_elixir $fname
             ;;
         *)
             echo "Unknown extension: $ext"

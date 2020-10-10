@@ -13,7 +13,7 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-$(dirname $0)/build $script
+$(dirname $0)/ac-build $script
 
 dirname=$(dirname $script)
 fname=$(basename $script)
