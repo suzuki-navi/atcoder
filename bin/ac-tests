@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -Ceu
 
@@ -18,10 +18,15 @@ $(dirname $0)/ac-build $script
 dirname=$(dirname $script)
 fname=$(basename $script)
 
-for f in $dirname/*.in; do
+testdir=$dirname
+if [ -d $dirname/tests ]; then
+    testdir=$dirname/tests
+fi
+
+for f in $testdir/*.in; do
     f2=$(echo $f | perl -nle '/^(.+)\.in$/ and print $1')
     echo $dirname/var/$fname-build/bin \< $f2.in \> $f2.result
-    /bin/time $dirname/var/$fname-build/bin < $f2.in >| $f2.result
+    time $dirname/var/$fname-build/bin < $f2.in >| $f2.result
     diff -u --color=always $f2.result $f2.out && echo OK
 done
 
