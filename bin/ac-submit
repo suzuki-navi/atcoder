@@ -1,0 +1,70 @@
+#!/bin/sh
+
+
+
+set -Ceu
+
+script=
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        *)
+            script=$1
+            ;;
+    esac
+    shift
+done
+
+if [ -z "$script" ]; then
+    echo "script file not specified." >&2
+    exit 1
+fi
+
+submit() {
+    local fname=$1
+
+    ext=${fname##*.}
+
+    case "$ext" in
+        cpp)
+            acc submit $fname -- --yes
+            ;;
+        java)
+            acc submit $fname -- --yes --language 4005
+            ;;
+        scala)
+            acc submit $fname -- --yes
+            ;;
+        #php)
+        #    build_php $fname
+        #    ;;
+        #pl)
+        #    build_perl $fname
+        #    ;;
+        #js)
+        #    build_nodejs $fname
+        #    ;;
+        #py)
+        #    build_python $fname
+        #    ;;
+        rb)
+            acc submit $fname -- --yes
+            ;;
+        ex)
+            acc submit $fname -- --yes --language 4021
+            ;;
+        *)
+            echo "Unknown extension: $ext"
+            exit 1
+            ;;
+    esac
+}
+
+dirname=$(dirname $script)
+fname=$(basename $script)
+(
+    cd $dirname
+    submit $fname
+) >&2
+
+
