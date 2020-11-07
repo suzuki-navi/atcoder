@@ -41,9 +41,9 @@ submit() {
         #pl)
         #    build_perl $fname
         #    ;;
-        #js)
-        #    build_nodejs $fname
-        #    ;;
+        js)
+            acc submit $fname -- --yes
+            ;;
         #py)
         #    build_python $fname
         #    ;;
