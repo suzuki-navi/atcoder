@@ -44,9 +44,9 @@ submit() {
         js)
             acc submit $fname -- --yes
             ;;
-        #py)
-        #    build_python $fname
-        #    ;;
+        py)
+            acc submit $fname -- --yes
+            ;;
         rb)
             acc submit $fname -- --yes
             ;;

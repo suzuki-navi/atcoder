@@ -13,6 +13,11 @@ while [ $# -gt 0 ]; do
     shift
 done
 
+build_c() {
+    local fname=$1
+    gcc -o var/$fname-build/bin $fname
+}
+
 build_cpp() {
     local fname=$1
     g++ -o var/$fname-build/bin $fname
@@ -87,6 +92,9 @@ build() {
     ext=${fname##*.}
 
     case "$ext" in
+        c)
+            build_c $fname
+            ;;
         cpp)
             build_cpp $fname
             ;;
